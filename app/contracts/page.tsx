@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ethers, BrowserProvider, Contract } from 'ethers';
+import { useRouter } from 'next/navigation';
 
 const contractArtifact = {
   "_format": "hh-sol-artifact-1",
@@ -57,6 +58,7 @@ export default function ContractInfoPage() {
   const [fetchedName, setFetchedName] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleFetchName = async () => {
     if (!contractAddress) {
@@ -94,6 +96,19 @@ export default function ContractInfoPage() {
     }
   };
 
+  const handleNavigate = () => {
+    if (!contractAddress) {
+      setError('Please enter a contract address.');
+      return;
+    }
+    if (!ethers.isAddress(contractAddress)) {
+      setError('Invalid Ethereum address.');
+      return;
+    }
+    setError('');
+    router.push(`/contracts/${contractAddress}`);
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <main className="flex flex-col items-center gap-8 w-full max-w-md">
@@ -122,6 +137,13 @@ export default function ContractInfoPage() {
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
           >
             {isLoading ? 'Fetching...' : 'Get Name from Contract'}
+          </button>
+          <button
+            onClick={handleNavigate}
+            disabled={isLoading}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          >
+            Go to Contract Page
           </button>
           {error && (
             <p className="mt-4 text-sm text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900 p-3 rounded-md">{error}</p>
